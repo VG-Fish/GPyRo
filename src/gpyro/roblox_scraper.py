@@ -37,10 +37,7 @@ class RobloxGameDataScraper:
         if "data" not in games:
             raise UnableToReachURL("Error: Unable to get game information.")
 
-        return self._combine_game_and_votes_data(games["data"], votes["data"])
-
-    def _combine_game_and_votes_data(self: Self, games_data: List[Dict], votes_data: List[Dict]) -> List[Dict]:
         results: List[Dict] = []
-        for game_data, vote_data in zip(games_data, votes_data):
+        for game_data, vote_data in zip(games, votes):
             results.append(game_data | vote_data)
         return results
