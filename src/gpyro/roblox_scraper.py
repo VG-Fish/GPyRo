@@ -14,9 +14,11 @@ class RobloxGameDataScraper:
     def get_games(
         self: Self,
         game_place_ids: RolimonsGamePlaceIdsType,
-        amount: int
+        amount: int | None = None
     ) -> List[Dict]:
-        if (
+        if amount is None:
+            amount = len(game_place_ids)
+        elif (
             type(amount) != type(int())
             or (amount <= 0 or amount > len(game_place_ids))
         ):
