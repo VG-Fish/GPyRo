@@ -40,7 +40,7 @@ class RolimonsScraper:
         ):
             raise ValueError(f"Parameter 'amount' must be a positive whole number that is less than {self.amount_of_games}.")
 
-        results: RolimonsGameInfoType = dict() #pyright: ignore
+        results: RolimonsGameInfoType = RolimonsGameInfoType(dict())
 
         match access_type:
             case RolimonsAccessTypeOptions.SEQUENTIAL:
