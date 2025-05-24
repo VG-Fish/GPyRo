@@ -21,15 +21,15 @@ class RolimonsScraper:
     def __init__(self: Self) -> None:
         self._rolimons_api_url: str = "https://api.rolimons.com/games/v1/gamelist"
 
-        self.data: Dict = r.get(self._rolimons_api_url).json()
+        self._data: Dict = r.get(self._rolimons_api_url).json()
 
-        if "game_count" not in self.data:
+        if "game_count" not in self._data:
             raise ValueError("Error: Unable to get the game information (specifically, game data information).")
 
-        self.amount_of_games: int = self.data["game_count"]
+        self.amount_of_games: int = self._data["game_count"]
 
         self._game_place_ids: List[int] = []
-        for place_id in self.data["games"]:
+        for place_id in self._data["games"]:
             self._game_place_ids.append(place_id)
 
     def get_games(self: Self, amount: int, access_type: RolimonsAccessTypeOptions) -> RolimonsGameInfoType:
@@ -48,10 +48,13 @@ class RolimonsScraper:
                 place_ids: List[int] = sample(self._game_place_ids, k=amount)
 
         for place_id in place_ids:
-            entry: List[int | str] = self.data["games"][place_id]
+            entry: List[int | str] = self._data["games"][place_id]
             results[place_id] = RolimonsGameMetadata(entry[0], entry[1], entry[2]) #pyright: ignore
         return results
 
     def save_all_game_data(self: Self, output_file_name: str) -> None:
-        df = pd.DataFrame(self.data)
-        df.to_parquet(output_file_name, compression="gzip")
+        df: pd.DataFrame = pd.DataFrame(self._data)
+        df.to_parquet(output_file_name, engine="fastparquet", compression="gzip")
+
+    def get_game_data(self: Self) -> Dict:
+        return self._data
