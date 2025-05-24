@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.13.0"
 dependencies = [
+    "aiohttp>=3.11.18",
     "fastparquet>=2024.11.0",
     "pandas>=2.2.3",
     "requests>=2.32.3",
