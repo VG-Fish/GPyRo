@@ -3,6 +3,8 @@ from errors import UnableToReachURL
 from rolimons_scraper import RolimonsGamePlaceIdsType
 import requests as r
 import pandas as pd
+from time import sleep
+from random import random
 
 class RobloxGameDataScraper:
     def __init__(self: Self) -> None:
@@ -15,7 +17,7 @@ class RobloxGameDataScraper:
         self: Self,
         game_place_ids: RolimonsGamePlaceIdsType,
         amount: int | None = None,
-        ignore_errors: bool = False
+        ignore_conversion_errors: bool = False
     ) -> List[Dict]:
         if amount is None:
             amount = len(game_place_ids)
@@ -28,12 +30,20 @@ class RobloxGameDataScraper:
         universe_id_urls: List[str] = []
         print("Converting Roblox place_ids to universe_ids...")
         for place_id, _ in zip(game_place_ids, range(amount)):
+            sleeping_time: float = 0.1 + random()
+            print(f"Sleeping for {sleeping_time}s.")
+            sleep(sleeping_time)
+
             place_id_to_universe_id_url: str = self._place_id_to_universe_id_url.format(place_id=place_id)
             print(f"Currently grabbing Roblox {place_id_to_universe_id_url}...")
             json = r.get(place_id_to_universe_id_url).json()
 
             if "universeId" not in json:
-                raise UnableToReachURL("Error: Unable to get universeId information.")
+                if ignore_conversion_errors:
+                    print(f"Error reaching {place_id_to_universe_id_url}!")
+                    continue
+                else:
+                    raise UnableToReachURL("Error: Unable to get universeId information.")
 
             universe_id: int = json["universeId"]
             universe_id_urls.append(str(universe_id))
@@ -47,10 +57,7 @@ class RobloxGameDataScraper:
         votes = r.get(universe_votes_id_url).json()
 
         if  "data" not in games or "data" not in votes:
-            if ignore_errors:
-                print(f"Error reaching {universe_id_url} & {universe_votes_id_url}!")
-            else:
-                raise UnableToReachURL("Error: Unable to get game information.")
+            raise UnableToReachURL("Error: Unable to get game information.")
 
         results: List[Dict] = []
         for game, vote in zip(games, votes):
