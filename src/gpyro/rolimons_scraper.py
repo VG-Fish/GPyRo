@@ -12,6 +12,7 @@ RolimonsGameMetadata = NamedTuple(
     ]
 )
 RolimonsGameInfoType = NewType("RolimonsGameInfoType", Dict[int, RolimonsGameMetadata])
+RolimonsGamePlaceIdsType = NewType("RolimonsGamePlaceIdsType", List[int])
 
 class RolimonsAccessTypeOptions(Enum):
     SEQUENTIAL = 1,
@@ -28,7 +29,7 @@ class RolimonsScraper:
 
         self.amount_of_games: int = self._data["game_count"]
 
-        self._game_place_ids: List[int] = []
+        self._game_place_ids: RolimonsGamePlaceIdsType = RolimonsGamePlaceIdsType([])
         for place_id in self._data["games"]:
             self._game_place_ids.append(place_id)
 
@@ -59,5 +60,5 @@ class RolimonsScraper:
     def get_game_data(self: Self) -> Dict:
         return self._data
 
-    def get_game_place_ids(self: Self) -> List[int]:
+    def get_game_place_ids(self: Self) -> RolimonsGamePlaceIdsType:
         return self._game_place_ids
