@@ -46,8 +46,11 @@ class RobloxGameDataScraper:
         games = r.get(universe_id_url).json()
         votes = r.get(universe_votes_id_url).json()
 
-        if not ignore_errors and "data" not in games or "data" not in votes:
-            raise UnableToReachURL("Error: Unable to get game information.")
+        if  "data" not in games or "data" not in votes:
+            if ignore_errors:
+                print(f"Error reaching {universe_id_url} & {universe_votes_id_url}!")
+            else:
+                raise UnableToReachURL("Error: Unable to get game information.")
 
         results: List[Dict] = []
         for game, vote in zip(games, votes):
