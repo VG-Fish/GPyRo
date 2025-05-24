@@ -6,18 +6,17 @@ import requests as r
 import pandas as pd
 
 RolimonsGameMetadata = NamedTuple(
-    "RolimonsGameMetadata", [
-        ("name", str),
-        ("active_players", int),
-        ("thumbnail_download_url", str)
-    ]
+    "RolimonsGameMetadata",
+    [("name", str), ("active_players", int), ("thumbnail_download_url", str)],
 )
 RolimonsGameInfoType = NewType("RolimonsGameInfoType", Dict[int, RolimonsGameMetadata])
 RolimonsGamePlaceIdsType = NewType("RolimonsGamePlaceIdsType", List[int])
 
+
 class RolimonsAccessTypeOptions(Enum):
-    SEQUENTIAL = 1,
+    SEQUENTIAL = 1
     RANDOM = 2
+
 
 class RolimonsScraper:
     def __init__(self: Self) -> None:
@@ -27,7 +26,9 @@ class RolimonsScraper:
         self._data: Dict = r.get(self._rolimons_api_url).json()
 
         if "game_count" not in self._data:
-            raise UnableToReachURL("Error: Unable to get the game information (specifically, game data information).")
+            raise UnableToReachURL(
+                "Error: Unable to get the game information (specifically, game data information)."
+            )
 
         self.amount_of_games: int = self._data["game_count"]
 
@@ -36,12 +37,15 @@ class RolimonsScraper:
             self._game_place_ids.append(place_id)
         print("Successfully got all of Rolimons' game data!")
 
-    def get_games(self: Self, amount: int, access_type: RolimonsAccessTypeOptions) -> RolimonsGameInfoType:
-        if (
-            type(amount) != type(int())
-            or (amount <= 0 or amount > self.amount_of_games)
+    def get_games(
+        self: Self, amount: int, access_type: RolimonsAccessTypeOptions
+    ) -> RolimonsGameInfoType:
+        if not isinstance(amount, int) or (
+            amount <= 0 or amount > self.amount_of_games
         ):
-            raise ValueError(f"Parameter 'amount' must be a positive whole number that is less than {self.amount_of_games}.")
+            raise ValueError(
+                f"Parameter 'amount' must be a positive whole number that is less than {self.amount_of_games}."
+            )
 
         results: RolimonsGameInfoType = RolimonsGameInfoType(dict())
 
@@ -53,7 +57,7 @@ class RolimonsScraper:
 
         for place_id in place_ids:
             entry: List[int | str] = self._data["games"][place_id]
-            results[place_id] = RolimonsGameMetadata(entry[0], entry[1], entry[2]) #pyright: ignore
+            results[place_id] = RolimonsGameMetadata(entry[0], entry[1], entry[2])  # pyright: ignore
 
         print("Returning all of Rolimons' game data!")
         return results
