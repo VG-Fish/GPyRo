@@ -58,3 +58,6 @@ class RolimonsScraper:
 
     def get_game_data(self: Self) -> Dict:
         return self._data
+
+    def get_game_place_ids(self: Self) -> List[int]:
+        return self._game_place_ids
