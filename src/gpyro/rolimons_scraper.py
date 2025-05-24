@@ -1,3 +1,4 @@
+from errors import UnableToReachURL
 from typing import Dict, List, Self, NewType, NamedTuple
 from enum import Enum
 from random import sample
@@ -25,7 +26,7 @@ class RolimonsScraper:
         self._data: Dict = r.get(self._rolimons_api_url).json()
 
         if "game_count" not in self._data:
-            raise ValueError("Error: Unable to get the game information (specifically, game data information).")
+            raise UnableToReachURL("Error: Unable to get the game information (specifically, game data information).")
 
         self.amount_of_games: int = self._data["game_count"]
 
