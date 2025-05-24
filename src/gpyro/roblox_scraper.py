@@ -14,7 +14,8 @@ class RobloxGameDataScraper:
     def get_games(
         self: Self,
         game_place_ids: RolimonsGamePlaceIdsType,
-        amount: int | None = None
+        amount: int | None = None,
+        ignore_errors: bool = False
     ) -> List[Dict]:
         if amount is None:
             amount = len(game_place_ids)
@@ -45,7 +46,7 @@ class RobloxGameDataScraper:
         games = r.get(universe_id_url).json()
         votes = r.get(universe_votes_id_url).json()
 
-        if "data" not in games or "data" not in votes:
+        if not ignore_errors and "data" not in games or "data" not in votes:
             raise UnableToReachURL("Error: Unable to get game information.")
 
         results: List[Dict] = []
