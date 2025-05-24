@@ -23,6 +23,7 @@ class RolimonsScraper:
     def __init__(self: Self) -> None:
         self._rolimons_api_url: str = "https://api.rolimons.com/games/v1/gamelist"
 
+        print("Getting all of Rolimons' game data...")
         self._data: Dict = r.get(self._rolimons_api_url).json()
 
         if "game_count" not in self._data:
@@ -33,6 +34,7 @@ class RolimonsScraper:
         self._game_place_ids: RolimonsGamePlaceIdsType = RolimonsGamePlaceIdsType([])
         for place_id in self._data["games"]:
             self._game_place_ids.append(place_id)
+        print("Successfully got all of Rolimons' game data!")
 
     def get_games(self: Self, amount: int, access_type: RolimonsAccessTypeOptions) -> RolimonsGameInfoType:
         if (
@@ -52,11 +54,15 @@ class RolimonsScraper:
         for place_id in place_ids:
             entry: List[int | str] = self._data["games"][place_id]
             results[place_id] = RolimonsGameMetadata(entry[0], entry[1], entry[2]) #pyright: ignore
+
+        print("Returning all of Rolimons' game data!")
         return results
 
     def save_all_game_data(self: Self, output_file_name: str) -> None:
+        print("Saving all Rolimons' game data...!")
         df: pd.DataFrame = pd.DataFrame(self._data)
         df.to_parquet(output_file_name, engine="fastparquet", compression="gzip")
+        print("Saved all Rolimons' game data successfully!")
 
     def get_game_data(self: Self) -> Dict:
         return self._data

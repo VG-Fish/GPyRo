@@ -25,8 +25,10 @@ class RobloxGameDataScraper:
             raise ValueError(f"Parameter 'amount' must be a positive whole number that is less than {len(game_place_ids)}.")
 
         universe_id_urls: List[str] = []
+        print("Converting Roblox place_ids to universe_ids...")
         for place_id, _ in zip(game_place_ids, range(amount)):
             place_id_to_universe_id_url: str = self._place_id_to_universe_id_url.format(place_id=place_id)
+            print(f"Currently grabbing Roblox {place_id_to_universe_id_url}...")
             json = r.get(place_id_to_universe_id_url).json()
 
             if "universeId" not in json:
@@ -39,6 +41,7 @@ class RobloxGameDataScraper:
         universe_id_url: str = self._game_data_url.format(universe_ids=universe_ids)
         universe_votes_id_url: str = self._game_votes_data_url.format(universe_ids=universe_ids)
 
+        print("Currently grabbing Roblox game data from universe ids...")
         games = r.get(universe_id_url).json()
         votes = r.get(universe_votes_id_url).json()
 
@@ -50,11 +53,14 @@ class RobloxGameDataScraper:
             results.append(game | vote)
         self._cache["game_data"] = results
 
+        print("Successfully got all Roblox game data.")
         return results
 
     def save_game_data(self: Self, output_file_name: str) -> None:
         if "game_data" not in self._cache:
             print("Nothing to be saved!")
 
+        print("Saving all Roblox game data...!")
         df: pd.DataFrame = pd.DataFrame(self._cache["game_data"])
         df.to_parquet(output_file_name, engine="fastparquet", compression="gzip")
+        print("Saved all Roblox game data successfully!")
