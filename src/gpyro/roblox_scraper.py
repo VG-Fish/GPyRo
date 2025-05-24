@@ -2,14 +2,20 @@ from typing import Self, List, Dict
 from errors import UnableToReachURL
 from rolimons_scraper import RolimonsGamePlaceIdsType
 import requests as r
+import pandas as pd
 
 class RobloxGameDataScraper:
     def __init__(self: Self) -> None:
         self._place_id_to_universe_id_url: str = "https://apis.roblox.com/universes/v1/places/{place_id}/universe"
         self._game_data_url: str = "https://games.roblox.com/v1/games?universeIds={universe_ids}"
         self._game_votes_data_url: str = "https://games.roblox.com/v1/games/votes?universeIds={universe_ids}"
+        self._cache: Dict = dict()
 
-    def get_games(self: Self, game_place_ids: RolimonsGamePlaceIdsType, amount: int) -> List[Dict]:
+    def get_games(
+        self: Self,
+        game_place_ids: RolimonsGamePlaceIdsType,
+        amount: int
+    ) -> List[Dict]:
         if (
             type(amount) != type(int())
             or (amount <= 0 or amount > len(game_place_ids))
@@ -40,4 +46,13 @@ class RobloxGameDataScraper:
         results: List[Dict] = []
         for game, vote in zip(games, votes):
             results.append(game | vote)
+        self._cache["game_data"] = results
+
         return results
+
+    def save_game_data(self: Self, output_file_name: str) -> None:
+        if "game_data" not in self._cache:
+            print("Nothing to be saved!")
+
+        df: pd.DataFrame = pd.DataFrame(self._cache["game_data"])
+        df.to_parquet(output_file_name, engine="fastparquet", compression="gzip")
