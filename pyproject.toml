@@ -1,0 +1,18 @@
+[project]
+name = "gpyro"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Vishy Gopal", email = "112359514+VG-Fish@users.noreply.github.com" }
+]
+requires-python = ">=3.13.0"
+dependencies = [
+    "fastparquet>=2024.11.0",
+    "pandas>=2.2.3",
+    "requests>=2.32.3",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
