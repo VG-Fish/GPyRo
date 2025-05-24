@@ -12,6 +12,7 @@ dependencies = [
     "fastparquet>=2024.11.0",
     "pandas>=2.2.3",
     "requests>=2.32.3",
+    "tqdm>=4.67.1",
 ]
 
 [build-system]

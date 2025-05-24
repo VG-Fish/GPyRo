@@ -1,13 +1,13 @@
 from typing import Self, List, Dict
 from errors import UnableToReachURL
 from rolimons_scraper import RolimonsGamePlaceIdsType
-from time import sleep
 from random import random
-import asyncio
 
 import requests as r
 import pandas as pd
 from aiohttp import ClientSession #pyright: ignore
+from asyncio import sleep
+from tqdm.asyncio import tqdm_asyncio
 
 class RobloxGameDataScraper:
     def __init__(self: Self) -> None:
@@ -18,19 +18,17 @@ class RobloxGameDataScraper:
         self._universe_ids: List[str] = []
 
     async def _fetch_universe_id(self: Self, place_id: int, session: ClientSession, ignore_conversion_errors: bool = False) -> int | None:
-        sleeping_time: float = random() * 0.1
-        print(f"Sleeping for {sleeping_time}s.")
-        sleep(sleeping_time)
+        sleeping_time: float = random()
+        await sleep(sleeping_time)
 
         place_id_to_universe_id_url: str = self._place_id_to_universe_id_url.format(place_id=place_id)
-        print(f"Currently grabbing Roblox {place_id_to_universe_id_url}")
 
         async with session.get(place_id_to_universe_id_url) as response:
             json = await response.json()
 
             if "universeId" not in json:
                 if ignore_conversion_errors:
-                    print(f"Error reaching {place_id_to_universe_id_url}!")
+                    print(f"Error reaching {place_id_to_universe_id_url}")
                     return
                 else:
                     raise UnableToReachURL("Error: Unable to get universeId information.")
@@ -59,7 +57,7 @@ class RobloxGameDataScraper:
                 self._fetch_universe_id(place_id, session, ignore_conversion_errors)
                 for place_id, _ in zip(game_place_ids, range(amount))
             ]
-            await asyncio.gather(*tasks)
+            await tqdm_asyncio.gather(*tasks)
 
         universe_ids: str = ",".join(self._universe_ids)
         universe_id_url: str = self._game_data_url.format(universe_ids=universe_ids)
